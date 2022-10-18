@@ -1,0 +1,92 @@
+\documentclass[25pt,a0paper,portrait,dvipsnames,colspace=0.4in,innermargin=0.4in]{tikzposter}
+
+% \usepackage[dvipsnames]{xcolor}
+
+\definecolor{ProfessionalGreen}{RGB}{0, 104, 106}
+\definecolor{ProfessionalDarkGreen}{RGB}{0, 33, 34}
+
+\definecolorstyle{MyPoster}{
+  \definecolor{colorOne}{named}{ProfessionalGreen}
+  \definecolor{colorTwo}{named}{RedOrange}
+  \definecolor{colorThree}{named}{RoyalBlue}
+}{
+  % Background Colors
+  \colorlet{backgroundcolor}{white}
+  \colorlet{framecolor}{black}
+  % Title Colors
+  \colorlet{titlefgcolor}{colorOne!5!white}
+  \colorlet{titlebgcolor}{colorOne}
+  % Block Colors
+  \colorlet{blocktitlebgcolor}{ProfessionalDarkGreen}
+  \colorlet{blocktitlefgcolor}{white}
+  \colorlet{blockbodybgcolor}{ProfessionalDarkGreen}
+  \colorlet{blockbodyfgcolor}{white}
+  % Innerblock Colors
+  \colorlet{innerblocktitlebgcolor}{white}
+  \colorlet{innerblocktitlefgcolor}{black}
+  \colorlet{innerblockbodybgcolor}{colorThree!30!white}
+  \colorlet{innerblockbodyfgcolor}{black}
+  % Note colors
+  \colorlet{notefgcolor}{black}
+  \colorlet{notebgcolor}{colorTwo!50!white}
+  \colorlet{noteframecolor}{colorTwo}
+}
+\settitle{\vbox{
+  \hspace*{2in}
+  \colorbox{white}{\hbox to 4in {\vbox to 4in {\vspace*{1.8in} \raisebox{-0.5\height}{\@titlegraphic}}}}
+  \hspace*{-6.8in}
+  \vbox{
+    % \@titlegraphic\\[\TP@titlegraphictotitledistance]
+    \raggedleft
+    \vspace*{0.5in}
+    \color{titlefgcolor} {\bfseries \Huge \sc \@title \hspace*{0.5in} \par}
+    \vspace*{1in}
+    \vbox{
+      {\LARGE \@author \par} \vspace*{0.3in} {\large \@institute}
+    }
+    \vspace*{-0.2in}
+  }
+}}
+
+\defineblockstyle{MyBlock}{
+  titlewidthscale=1, bodywidthscale=1, titleleft,
+  titleoffsetx=0in, titleoffsety=0in, bodyoffsetx=0in, bodyoffsety=0.6in,
+  bodyverticalshift=0.6in, roundedcorners=2, linewidth=5pt,
+  titleinnersep=0.3in, bodyinnersep=0.3in
+}{
+  \begin{scope}[line width=\blocklinewidth, rounded corners=\blockroundedcorners]
+    \ifBlockHasTitle %
+      \draw[color=blocktitlebgcolor, fill=blocktitlebgcolor] (blockbody.south west) rectangle (blocktitle.north east);
+      \draw[color=blocktitlebgcolor, fill=blockbodybgcolor] (blockbody.south west) rectangle (blockbody.north east);
+      \draw[color=blocktitlefgcolor, thin] ($(blocktitle.south west) + (1em,0)$) -- ($(blocktitle.south east) + (-1em, 0)$);
+    \else
+      \draw[color=blocktitlebgcolor, fill=blockbodybgcolor] (blockbody.south west) rectangle (blockbody.north east);
+    \fi
+  \end{scope}
+}
+
+% \usetheme{Autumn}
+\usetitlestyle[titletoblockverticalspace=0.5in,innersep=0in,linewidth=0in]{Filled}
+\usecolorstyle{MyPoster}
+\useblockstyle[roundedcorners=2]{MyBlock}
+
+\begin{document}
+\title{Type System for Metaprogramming}
+\author{Junyoung ``Clare'' Jang}
+\date{\today}
+\institute{Complogic Group}
+\titlegraphic{\includegraphics[width=4in]{./mcgill_sig_red.png}}
+%% Abstract:
+%% Metaprogramming is the art of generating, manipulating, and analyzing code. This technique is nearly universal: compilers, user libraries, and program analyzers use this technique for both better performance and easier maintenance. However, metaprogramming have been suffered from one issue: it is harder to write a reliable and safe metaprogram, especially because they are harder to test thoroughly. This poster will present how to give static reliability and safety guarantees using a type system on metaprograms, illustrated with issues in a type system for metaprogramming and our solutions.
+\maketitle{}
+
+\begin{columns}
+  \column{0.5}
+  \block{Test}{Some text}
+
+  \block{Test}{Some text}
+
+  \column{0.5}
+  \block{Test}{Some text}
+\end{columns}
+\end{document}
