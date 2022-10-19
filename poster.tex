@@ -1,4 +1,4 @@
-\documentclass[25pt,a0paper,portrait,innermargin=0.4in,colspace=0.4in,blockverticalspace=0.4in]{tikzposter}
+\documentclass[25pt,a0paper,portrait,dvipsnames,innermargin=0.4in,colspace=0.4in,blockverticalspace=0.4in]{tikzposter}
 
 \usepackage{amssymb}
 \usepackage{libertine}
@@ -85,24 +85,26 @@
   \end{center}
 }
 
-% \lstdefinelanguage{Moebius}%
-% {%
-%   keywords=%
-%   {%
-%     box, unbox, with,%
-%     mFn,tFn,fn,fix,%
-%     if,else,then,match,%
-%     let,in,%
-%     case,of,%
-%     type,%
-%   },%
-%   sensitive,
-%   morecomment=[l]{--},%
-%   moredelim=[is][\color{orange}]{o<<}{>>o},%
-%   moredelim=[is][\color{violet}]{v<<}{>>v},%
-%   moredelim=[is][\color{NavyBlue}]{nb<<}{>>nb},%
-%   moredelim=[is][\color{WildStrawberry}]{ws<<}{>>ws},%
-% }
+\lstdefinelanguage{Moebius}%
+{%
+  keywords=%
+  {%
+    box,with,%
+    Fun,fun,%
+    if,else,then,match,%
+    let,in,%
+    case,of,%
+    type,%
+  },%
+  sensitive,
+  morecomment=[l]{--},%
+  moredelim=[is][\color{orange}]{o<<}{>>o},%
+  moredelim=[is][\color{violet}]{v<<}{>>v},%
+  moredelim=[is][\color{ForestGreen}]{fg<<}{>>fg},%
+  moredelim=[is][\color{NavyBlue}]{nb<<}{>>nb},%
+  moredelim=[is][\color{WildStrawberry}]{ws<<}{>>ws},%
+  moredelim=[is][\color{white}]{w<<}{>>w},%
+}
 % \lstset{%
 %   basicstyle=\ttfamily\footnotesize,%
 %   keywordstyle=\color{blue}\bfseries,%
@@ -130,11 +132,9 @@
 %   belowskip=0.05in,%
 %   aboveskip=0.05in,%
 % }
-% \lstloadlanguages{Moebius}
-% \lstset{language=Moebius}
-
 \lstset{
   basicstyle=\color{black!5!white}\ttfamily,%
+  keywordstyle=\color{orange},%
   xleftmargin=1in,%
   xrightmargin=1in,%
   framextopmargin=0.5in,%
@@ -149,41 +149,39 @@
   literate=%
   {\\Box}{{\(\Box\)}}1 %
   ,%
-  moredelim=[is][\color{orange}]{o<<}{>>o},%
-  moredelim=[is][\color{violet}]{v<<}{>>v},%
-  moredelim=[is][\color{NavyBlue}]{nb<<}{>>nb},%
-  moredelim=[is][\color{WildStrawberry}]{ws<<}{>>ws},%
 }
+\lstloadlanguages{Moebius}
+\lstset{language=Moebius}
 
-\newcommand\moeb[1]{\lstinline[flexiblecolumns=false]{#1}}
+\newcommand\moeb[1]{\colorbox{black}{\lstinline[flexiblecolumns=false]{#1}}}
 
 \begin{filecontents*}[overwrite]{src/untyped-nth.premoebius}
-o<<nth>>o n =
+ws<<nth>>ws n =
   if n <= 0 then
-    o<<box>>o(head xs)
+    box(nb<<head xs>>nb)
   else
-    let box(C) = nth (n - 1) in
-    box(let xs = tail xs in C)
+    let box(C) = ws<<nth>>ws (n - 1) in
+    box(nb<<let xs = tail xs in>>nb C)
 \end{filecontents*}
 
 \begin{filecontents*}[overwrite]{src/int-nth.moebius}
-nth : Int -> \Box (List Int -> Int)
-o<<nth>>o n =
+ws<<nth>>ws : fg<<Int -> \Box (Int list -> Int)>>fg
+ws<<nth>>ws n =
   if n <= 0 then
-    o<<box>>o(fun xs => head Int xs)
+    box(nb<<fun xs => head Int xs>>nb)
   else
     let box(C) = nth (n - 1) in
-    box(fun xs => C (tail Int xs))
+    box(nb<<fun xs =>>>nb C nb<<(tail Int xs)>>nb)
 \end{filecontents*}
 
 \begin{filecontents*}[overwrite]{src/polymorphic-nth-wrong.moebius}
-nth : (a' : Type) -> Int -> \Box (List 'a -> 'a)
-o<<nth>>o a' n =
+ws<<nth>>ws : fg<<(a' : Type) -> Int -> \Box ('a list -> 'a)>>fg
+ws<<nth>>ws a' n =
   if n <= 0 then
-    o<<box>>o(fun xs => head a' xs)
+    box(nb<<fun xs => head a' xs>>nb)
   else
     let box(C) = nth a' (n - 1) in
-    box(fun xs => C (tail a' xs))
+    box(nb<<fun xs =>>>nb C nb<<(tail a' xs)>>nb)
 \end{filecontents*}
 
 \begin{document}
@@ -199,11 +197,12 @@ o<<nth>>o a' n =
 \begin{columns}
   \column{0.5}
   \block{Metaprogramming}{
-    The art of generating, manipulating, and analyzing code
+    The art of generating, manipulating, and analyzing code\\
+    \mbox{}\hfill\(\longleftarrow{}\) Compiler,Program Analyzer,Program generator,etc.\\
     \begin{tikzfigure*}
       \begin{tikzpicture}
-        \draw (0,2) node {\moeb{box(2 + 3)}} (20,2) node {A code fragment for code \moeb{2 + 3}};
-        \draw (0,0) node {\moeb{let box(C) = box(2 + 3) in C}} (20,0) node {Execution of \moeb{C} to get \moeb{5}};
+        \draw (0,2) node {\moeb{box(nb<<2 + 3>>nb)}} (20,2) node {A code fragment for code \moeb{nb<<2 + 3>>nb}};
+        \draw (0,0) node {\moeb{let box(C) = box(nb<<2 + 3>>nb) in C}} (20,0) node {Execution of \moeb{C} to get \moeb{5}};
       \end{tikzpicture}
     \end{tikzfigure*}
     \begin{tikzfigure*}[Untyped Metaprogram to get nth item in a list with no type/scope checking]
