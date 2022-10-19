@@ -1,6 +1,8 @@
-\documentclass[25pt,a0paper,portrait,dvipsnames,innermargin=0.4in,colspace=0.4in,blockverticalspace=0.4in]{tikzposter}
+\documentclass[25pt,a0paper,portrait,innermargin=0.4in,colspace=0.4in,blockverticalspace=0.4in]{tikzposter}
 
-% \usepackage[dvipsnames]{xcolor}
+\usepackage{amssymb}
+\usepackage{libertine}
+\usepackage{listings}
 
 \definecolor{ProfessionalGreen}{RGB}{0, 104, 106}
 \definecolor{ProfessionalDarkGreen}{RGB}{0, 33, 34}
@@ -18,9 +20,9 @@
   \colorlet{titlebgcolor}{colorOne}
   % Block Colors
   \colorlet{blocktitlebgcolor}{ProfessionalDarkGreen}
-  \colorlet{blocktitlefgcolor}{white}
+  \colorlet{blocktitlefgcolor}{ProfessionalDarkGreen!10!white}
   \colorlet{blockbodybgcolor}{ProfessionalDarkGreen}
-  \colorlet{blockbodyfgcolor}{white}
+  \colorlet{blockbodyfgcolor}{ProfessionalDarkGreen!10!white}
   % Innerblock Colors
   \colorlet{innerblocktitlebgcolor}{white}
   \colorlet{innerblocktitlefgcolor}{black}
@@ -33,7 +35,7 @@
 }
 \settitle{\vbox{
   \hspace*{2in}
-  \colorbox{white}{\hbox to 4in {\vbox to 4in {\vspace*{1.8in} \raisebox{-0.5\height}{\@titlegraphic}}}}
+  \colorbox{white}{\hbox to 4in {\vbox to 4in {\vspace*{1.6in} \raisebox{-0.5\height}{\@titlegraphic}}}}
   \hspace*{-6.8in}
   \vbox{
     % \@titlegraphic\\[\TP@titlegraphictotitledistance]
@@ -42,7 +44,7 @@
     \color{titlefgcolor} {\bfseries \Huge \sc \@title \hspace*{0.5in} \par}
     \vspace*{1in}
     \vbox{
-      {\LARGE \@author \par} \vspace*{0.3in} {\large \@institute}
+      {\LARGE \@author \par} \vspace*{0.2in} {\large https://Ailrun.github.io \par} \vspace*{0.3in} {\large \@institute}
     }
     \vspace*{-0.2in}
   }
@@ -70,6 +72,120 @@
 \usecolorstyle{MyPoster}
 \useblockstyle[roundedcorners=2]{MyBlock}
 
+\newenvironment{tikzfigure*}[1][]{
+  \def \rememberparameter{#1}
+  \vspace{10pt}
+  \begin{center}
+  }{
+    \ifx\rememberparameter\@empty
+    \else %nothing
+    \vspace{10pt}
+    {\small \rememberparameter}
+    \fi
+  \end{center}
+}
+
+% \lstdefinelanguage{Moebius}%
+% {%
+%   keywords=%
+%   {%
+%     box, unbox, with,%
+%     mFn,tFn,fn,fix,%
+%     if,else,then,match,%
+%     let,in,%
+%     case,of,%
+%     type,%
+%   },%
+%   sensitive,
+%   morecomment=[l]{--},%
+%   moredelim=[is][\color{orange}]{o<<}{>>o},%
+%   moredelim=[is][\color{violet}]{v<<}{>>v},%
+%   moredelim=[is][\color{NavyBlue}]{nb<<}{>>nb},%
+%   moredelim=[is][\color{WildStrawberry}]{ws<<}{>>ws},%
+% }
+% \lstset{%
+%   basicstyle=\ttfamily\footnotesize,%
+%   keywordstyle=\color{blue}\bfseries,%
+%   numberstyle=\ttfamily\bfseries\color{gray}\footnotesize,%
+%   literate=%
+%   {->}{{\(\rightarrow\ \)}}2 %
+%   {|-}{{\(\vdash\)}}2 %
+%   {\\alpha}{{\(\alpha\)}}1 %
+%   {\\beta}{{\(\beta\)}}1 %
+%   {\\tau}{{\(\tau\)}}1 %
+%   {\\sigma}{{\(\sigma\)}}1 %
+%   {\\rho}{{\(\rho\)}}1 %
+%   {\\Gamma}{{\(\Gamma\)}}1 %
+%   {\\Psi}{{\(\Psi\)}}1 %
+%   {[}{{\(\lceil\)}}1 % box
+%   {]}{{\(\rceil\)}}1 % box
+%   {u<}{{\(\lfloor\)}}1 % unbox
+%   {>u}{{\(\rfloor\)}}1 % unbox
+%   {v[}{[}1 % list
+%   {]v}{]}1 % list
+%   ,%
+%   mathescape=true,%
+%   xleftmargin=0.05in,%
+%   resetmargins=true,%
+%   belowskip=0.05in,%
+%   aboveskip=0.05in,%
+% }
+% \lstloadlanguages{Moebius}
+% \lstset{language=Moebius}
+
+\lstset{
+  basicstyle=\color{black!5!white}\ttfamily,%
+  xleftmargin=1in,%
+  xrightmargin=1in,%
+  framextopmargin=0.5in,%
+  framexbottommargin=0.5in,%
+  framexleftmargin=0.5in,%
+  framexrightmargin=0.5in,%
+  framesep=0in,%
+  frame=single,%
+  framerule=0in,%
+  backgroundcolor=\color{black},%
+  mathescape=true,
+  literate=%
+  {\\Box}{{\(\Box\)}}1 %
+  ,%
+  moredelim=[is][\color{orange}]{o<<}{>>o},%
+  moredelim=[is][\color{violet}]{v<<}{>>v},%
+  moredelim=[is][\color{NavyBlue}]{nb<<}{>>nb},%
+  moredelim=[is][\color{WildStrawberry}]{ws<<}{>>ws},%
+}
+
+\newcommand\moeb[1]{\lstinline[flexiblecolumns=false]{#1}}
+
+\begin{filecontents*}[overwrite]{src/untyped-nth.premoebius}
+o<<nth>>o n =
+  if n <= 0 then
+    o<<box>>o(head xs)
+  else
+    let box(C) = nth (n - 1) in
+    box(let xs = tail xs in C)
+\end{filecontents*}
+
+\begin{filecontents*}[overwrite]{src/int-nth.moebius}
+nth : Int -> \Box (List Int -> Int)
+o<<nth>>o n =
+  if n <= 0 then
+    o<<box>>o(fun xs => head Int xs)
+  else
+    let box(C) = nth (n - 1) in
+    box(fun xs => C (tail Int xs))
+\end{filecontents*}
+
+\begin{filecontents*}[overwrite]{src/polymorphic-nth-wrong.moebius}
+nth : (a' : Type) -> Int -> \Box (List 'a -> 'a)
+o<<nth>>o a' n =
+  if n <= 0 then
+    o<<box>>o(fun xs => head a' xs)
+  else
+    let box(C) = nth a' (n - 1) in
+    box(fun xs => C (tail a' xs))
+\end{filecontents*}
+
 \begin{document}
 \title{Type System for Metaprogramming}
 \author{Junyoung ``Clare'' Jang}
@@ -77,26 +193,45 @@
 \institute{Complogic Group}
 \titlegraphic{\includegraphics[width=4in]{./mcgill_sig_red.png}}
 %% Abstract:
-%% Metaprogramming is the art of generating, manipulating, and analyzing code. This technique is nearly universal: compilers, user libraries, and program analyzers use this technique for both better performance and easier maintenance. However, metaprogramming have been suffered from one issue: it is harder to write a reliable and safe metaprogram, especially because they are harder to test thoroughly. This poster will present how to give static reliability and safety guarantees using a type system on metaprograms, illustrated with issues in a type system for metaprogramming and our solutions.
+%% Metaprogramming is the art of generating, manipulating, and analyzing code. This technique is nearly universal: compilers, user libraries, and program analyzers use this technique for both better performance and easier maintenance. However, metaprogramming has been suffered from one issue: it is harder to write a reliable and safe metaprogram, especially because they are harder to test thoroughly. This poster will present how to give static reliability and safety guarantees using a type system on metaprograms, illustrated with issues in a type system for metaprogramming and our solutions.
 \maketitle{}
 
 \begin{columns}
   \column{0.5}
-  \block{Metaprogramming}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
+  \block{Metaprogramming}{
+    The art of generating, manipulating, and analyzing code
+    \begin{tikzfigure*}
+      \begin{tikzpicture}
+        \draw (0,2) node {\moeb{box(2 + 3)}} (20,2) node {A code fragment for code \moeb{2 + 3}};
+        \draw (0,0) node {\moeb{let box(C) = box(2 + 3) in C}} (20,0) node {Execution of \moeb{C} to get \moeb{5}};
+      \end{tikzpicture}
+    \end{tikzfigure*}
+    \begin{tikzfigure*}[Untyped Metaprogram to get nth item in a list with no type/scope checking]
+      \lstinputlisting{src/untyped-nth.premoebius}
+    \end{tikzfigure*}
+    Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
 
-  % Maybe merging it with the above?
-  \block{Metaprogramming based on Box/Unbox (Opt)}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
+  \block{\emph{Typed} Metaprogramming}{
+    Some text text text text text text text text text text text text text text text text text text text text text text text text text text text
+    \begin{tikzfigure*}[Typed Metaprogram to get nth item in an int list]
+      \lstinputlisting{src/int-nth.moebius}
+    \end{tikzfigure*}
+    Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
 
-  % Maybe merging it with the above?
-  \block{Metaprogramming based on Box/Let-box}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
+  \block{Problem 1 \---- Well-typed Open Code Fragments}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
 
-  \block{Problem 1 \---- Open Code Fragments}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
+  \block{Problem 2 \---- Polymorphism}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text
+    \begin{tikzfigure*}[Ill-typed Metaprogram to get nth item in a list]
+      \lstinputlisting{src/polymorphic-nth-wrong.moebius}
+    \end{tikzfigure*}
+    Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
 
-  \block{Problem 2 \---- Polymorphism}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
-
-  \block{Problem 3 \---- Pattern matching}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
+  \block{Problem 3 \---- Pattern Matching on Code Fragments}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
 
   \column{0.5}
+  % Judgment - explanation form
+  % Rule - explanation form
+  % Connection between ``necessity'' and ``code fragment''
   \block{Modal Logic}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
 
   \block{Contextual Modality}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
