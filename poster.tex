@@ -3,6 +3,7 @@
 \usepackage{amssymb}
 \usepackage{libertine}
 \usepackage{listings}
+\usepackage[most]{tcolorbox}
 
 \definecolor{ProfessionalGreen}{RGB}{0, 104, 106}
 \definecolor{ProfessionalDarkGreen}{RGB}{0, 33, 34}
@@ -133,55 +134,83 @@
 %   aboveskip=0.05in,%
 % }
 \lstset{
-  basicstyle=\color{black!5!white}\ttfamily,%
+  basicstyle=\small\color{black!5!white}\ttfamily,%
   keywordstyle=\color{orange},%
-  xleftmargin=1in,%
-  xrightmargin=1in,%
-  framextopmargin=0.5in,%
-  framexbottommargin=0.5in,%
-  framexleftmargin=0.5in,%
-  framexrightmargin=0.5in,%
+  xleftmargin=0.8in,%
+  xrightmargin=0.8in,%
+  framextopmargin=0.3in,%
+  framexbottommargin=0.3in,%
+  framexleftmargin=0.3in,%
+  framexrightmargin=0.3in,%
   framesep=0in,%
   frame=single,%
   framerule=0in,%
   backgroundcolor=\color{black},%
   mathescape=true,
   literate=%
-  {\\Box}{{\(\Box\)}}1 %
+  {_1}{{\(_1\)}}2 %
+  {_2}{{\(_2\)}}2 %
+  {Box}{{\(\Box\)}}1 %
   ,%
 }
 \lstloadlanguages{Moebius}
 \lstset{language=Moebius}
 
-\newcommand\moeb[1]{\colorbox{black}{\lstinline[flexiblecolumns=false]{#1}}}
+\tcbset{
+  on line,%
+  boxsep=0.2em,%
+  left=0pt,%
+  right=0pt,%
+  top=0pt,%
+  bottom=0pt,%
+  colframe=black,%
+  colback=black,%
+  highlight math style={enhanced},%
+}
+
+\newcommand\moeb[1]{\tcbox{\lstinline[flexiblecolumns=false]{#1}}}
 
 \begin{filecontents*}[overwrite]{src/untyped-nth.premoebius}
-ws<<nth>>ws n =
+ws<<untypedNth>>ws n =
   if n <= 0 then
     box(nb<<head xs>>nb)
   else
-    let box(C) = ws<<nth>>ws (n - 1) in
+    let box(C) = ws<<untypedNth>>ws (n - 1) in
     box(nb<<let xs = tail xs in>>nb C)
 \end{filecontents*}
 
+\begin{filecontents*}[overwrite]{src/untyped-nth-2-result.premoebius}
+box(nb<<let xs = tail xs in
+    let xs = tail xs in
+    head xs>>nb)
+\end{filecontents*}
+
 \begin{filecontents*}[overwrite]{src/int-nth.moebius}
-ws<<nth>>ws : fg<<Int -> \Box (Int list -> Int)>>fg
-ws<<nth>>ws n =
+ws<<intNth>>ws : fg<<Int -> Box (Int list -> Int)>>fg
+ws<<intNth>>ws n =
   if n <= 0 then
     box(nb<<fun xs => head Int xs>>nb)
   else
-    let box(C) = nth (n - 1) in
+    let box(C) = ws<<intNth>>ws (n - 1) in
     box(nb<<fun xs =>>>nb C nb<<(tail Int xs)>>nb)
 \end{filecontents*}
 
+\begin{filecontents*}[overwrite]{src/int-nth-2-result.moebius}
+box(nb<<fun xs =>
+      (fun xs =>
+        (fun xs => head xs)
+        (tail xs))
+      (tail xs)>>nb)
+\end{filecontents*}
+
 \begin{filecontents*}[overwrite]{src/polymorphic-nth-wrong.moebius}
-ws<<nth>>ws : fg<<(a' : Type) -> Int -> \Box ('a list -> 'a)>>fg
-ws<<nth>>ws a' n =
+ws<<badPolyNth>>ws : fg<<('a : Type) -> Int -> Box ('a list -> 'a)>>fg
+ws<<badPolyNth>>ws 'a n =
   if n <= 0 then
-    box(nb<<fun xs => head a' xs>>nb)
+    box(nb<<fun xs => head 'a xs>>nb)
   else
-    let box(C) = nth a' (n - 1) in
-    box(nb<<fun xs =>>>nb C nb<<(tail a' xs)>>nb)
+    let box(C) = ws<<badPolyNth>>ws 'a (n - 1) in
+    box(nb<<fun xs =>>>nb C nb<<(tail 'a xs)>>nb)
 \end{filecontents*}
 
 \begin{document}
@@ -197,41 +226,137 @@ ws<<nth>>ws a' n =
 \begin{columns}
   \column{0.5}
   \block{Metaprogramming}{
-    The art of generating, manipulating, and analyzing code\\
-    \mbox{}\hfill\(\longleftarrow{}\) Compiler,Program Analyzer,Program generator,etc.\\
     \begin{tikzfigure*}
       \begin{tikzpicture}
-        \draw (0,2) node {\moeb{box(nb<<2 + 3>>nb)}} (20,2) node {A code fragment for code \moeb{nb<<2 + 3>>nb}};
-        \draw (0,0) node {\moeb{let box(C) = box(nb<<2 + 3>>nb) in C}} (20,0) node {Execution of \moeb{C} to get \moeb{5}};
+        \node at (0,2) {\LARGE The art of generating, manipulating, and analyzing code};
+        \node at (0,0) {(Used for Compiler, Program Analyzer, Program generator, etc.)};
       \end{tikzpicture}
     \end{tikzfigure*}
-    \begin{tikzfigure*}[Untyped Metaprogram to get nth item in a list with no type/scope checking]
+    \begin{tikzfigure*}
+      \usetikzlibrary{arrows}
+      \pgfdeclarelayer{background}
+      \pgfsetlayers{background,main,notelayer}
+      \begin{tikzpicture}
+        \node[draw,text width=2.6in,align=center] (n0) at (10,0) {Program};
+        \node[draw,text width=2.6in,align=center] (n4) at (28,0) {Result};
+        \node[align=center] (nt) at (0,0) {\bfseries Direct Programming};
+
+        \draw[-latex,line width=0.05in] (n0.east) -- (n4.west);
+
+        \node[draw,text width=2.6in,align=center] (m0) at (10,-4) {Meta\--program};
+        \node[draw,text width=2.7in,align=center] (m2) at (19,-4) {Object program};
+        \node[draw,text width=2.6in,align=center] (m4) at (28,-4) {Result};
+        \node[align=center] (mt) at (0,-4) {\bfseries Metaprogramming};
+
+        \draw[-latex,line width=0.05in] (m0.east) -- (m2.west);
+        \draw[-latex,line width=0.05in] (m2.east) -- (m4.west);
+
+        \begin{pgfonlayer}{background}
+          \filldraw[line width=0.5in,join=round,draw=colorOne,fill=colorOne]
+          (n0.north  -| n0.west) rectangle (n4.south  -| n4.east)
+          (m0.north  -| m0.west) rectangle (m4.south  -| m4.east);
+        \end{pgfonlayer}
+      \end{tikzpicture}
+    \end{tikzfigure*}
+  }
+  \block{Metaprogramming with Box/Let-box}{
+    \begin{tikzfigure*}
+      \begin{tikzpicture}
+        \draw (0,2) node {\moeb{box(nb<<2 + 3>>nb)}} (20,2) node {A code fragment for \moeb{nb<<2 + 3>>nb}};
+        \draw (0,0) node {\moeb{let box(C) = box(nb<<2 + 3>>nb) in C}} (20,0) node {Execution of code \moeb{nb<<2 + 3>>nb} to get \moeb{5}};
+      \end{tikzpicture}
+    \end{tikzfigure*}
+    \begin{tikzfigure*}[Untyped Metaprogram to get \(n\)-th item in a list]
       \lstinputlisting{src/untyped-nth.premoebius}
     \end{tikzfigure*}
-    Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
+    If we evaluate \moeb{ws<<untypedNth>>ws 2}, we get
+    \begin{tikzfigure*}
+      \lstinputlisting{src/untyped-nth-2-result.premoebius}
+      % \usetikzlibrary{arrows.meta}
+      % \pgfdeclarelayer{background}
+      % \pgfsetlayers{background,main,notelayer}
+      % \begin{tikzpicture}
+      %   % double=blocktitlebgcolor,double distance=0.05in,
+      %   \node (a) at (18,0) {\moeb{box(nb<<let xs = tail xs in head xs>>nb)}};
+      %   \draw[line width=0.02in,double=blocktitlebgcolor,double distance=0.05in,-Implies] (b.east) -- (a.west);
+      % \end{tikzpicture}
+    \end{tikzfigure*}}
 
   \block{\emph{Typed} Metaprogramming}{
-    Some text text text text text text text text text text text text text text text text text text text text text text text text text text text
-    \begin{tikzfigure*}[Typed Metaprogram to get nth item in an int list]
-      \lstinputlisting{src/int-nth.moebius}
-    \end{tikzfigure*}
-    Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
+    We want to ensure that generated code will be well-typed \emph{before} executing a meta-program.
+    \begin{tikzfigure*}
+      \usetikzlibrary{arrows}
+      \pgfdeclarelayer{background}
+      \pgfsetlayers{background,main,notelayer}
+      \begin{tikzpicture}
+        \node[draw,text width=2.6in,align=center] (mts) at (10,0) {Type System};
+        \node[draw,orange,text width=2.6in,align=center] (m0) at (10,-4) {Meta\--program};
+        \node[draw,NavyBlue!40!white,text width=2.7in,align=center] (m2) at (19,-4) {Object program};
+        \node[draw,text width=2.6in,align=center] (m4) at (28,-4) {Result};
+        % \node[align=center] (mt) at (0,-4) {\bfseries Metaprogramming};
 
-  \block{Problem 1 \---- Well-typed Open Code Fragments}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
+        \draw[-latex,line width=0.05in] (m0.east) -- (m2.west);
+        \draw[-latex,line width=0.05in] (m2.east) -- (m4.west);
 
-  \block{Problem 2 \---- Polymorphism}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text
-    \begin{tikzfigure*}[Ill-typed Metaprogram to get nth item in a list]
-      \lstinputlisting{src/polymorphic-nth-wrong.moebius}
-    \end{tikzfigure*}
-    Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
+        \draw[orange,-latex,line width=0.05in] (mts.south) -- node[pos=0.5,anchor=east] (mtc) {Type Check} (m0.north);
+        \draw[NavyBlue!40!white,-latex,line width=0.05in] (mts.east) -| node[pos=0.5,anchor=west] (mgt) {Guarantee Well-Typedness} (m2.north);
 
-  \block{Problem 3 \---- Pattern Matching on Code Fragments}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
+        \begin{pgfonlayer}{background}
+          \filldraw[line width=0.5in,join=round,draw=colorOne,fill=colorOne]
+          (mts.north  -| mtc.west) rectangle (m4.south  -| m4.east);
+        \end{pgfonlayer}
+      \end{tikzpicture}
+    \end{tikzfigure*}}
 
-  \column{0.5}
   % Judgment - explanation form
   % Rule - explanation form
   % Connection between ``necessity'' and ``code fragment''
-  \block{Modal Logic}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
+  \block{Modal Logic}{
+    \begin{tikzfigure*}
+      \usetikzlibrary{arrows.meta}
+      \pgfdeclarelayer{background}
+      \pgfsetlayers{background,main,notelayer}
+      \begin{tikzpicture}
+        \node[draw,text width=4.5in,align=center] (codel) at (0, 0) {Well-typed Closed Code Fragment};
+        \node[draw,text width=4.5in,align=center] (coder) at (18, 0) {Well-typed under\\{}\emph{Any} Environment};
+
+        \draw[Implies-Implies,line width=0.02in,double=colorOne,double distance=0.05in,shorten <=0.1in,shorten >=0.1in] (codel) -- (coder);
+
+        \node[draw,text width=4.5in,align=center] (modall) at (0, -4) {Necessary Truth (in S4)};
+        \node[draw,text width=4.5in,align=center] (modalr) at (18, -4) {True under \emph{Any} World};
+
+        \draw[Implies-Implies,line width=0.02in,double=colorOne,double distance=0.05in,shorten <=0.1in,shorten >=0.1in] (modall) -- (modalr);
+
+        \begin{pgfonlayer}{background}
+          \filldraw[line width=0.5in,join=round,draw=colorOne,fill=colorOne]
+          (codel.north  -| codel.west) rectangle (modalr.south  -| modalr.east);
+        \end{pgfonlayer}
+      \end{tikzpicture}
+    \end{tikzfigure*}
+    \begin{tikzfigure*}
+      \begin{tikzpicture}
+        \draw (0,3) node {\moeb{fg<<Box A>>fg}} (20,3) node {A type for code generating \moeb{fg<<A>>fg}-typed program};
+        \draw (0,0) node {\moeb{box(M)} has type \moeb{fg<<Box A>>fg}} (20,0) node[text width=6.5in] {\moeb{M} has type \moeb{fg<<A>>fg} but does not use\\ any environment-specific information};
+      \end{tikzpicture}
+    \end{tikzfigure*}
+    \begin{tikzfigure*}[Typed Metaprogram to get nth item in an int list]
+      \lstinputlisting{src/int-nth.moebius}
+    \end{tikzfigure*}
+    If we execute \moeb{ws<<intNth>>ws 2}, we get
+    \begin{tikzfigure*}
+      \lstinputlisting{src/int-nth-2-result.moebius}
+    \end{tikzfigure*}}
+
+  \column{0.5}
+  \block{Problem 1 \---- Well-typed Open Code Fragments}{\moeb{ws<<untypedNth>>ws 2} has a free variable \moeb{xs}, but we cannot type check this as-is with Simple S4. Thus, \moeb{ws<<intNth>>ws 2} has some redundant anonymous functions and function calls.}
+
+  \block{Problem 2 \---- Polymorphism}{\moeb{ws<<intNth>>ws 2} works only for \moeb{ws<<Int>>ws} lists. The following approach to polymorphism does not work:
+    \begin{tikzfigure*}[Ill-typed Metaprogram to get nth item in a list]
+      \lstinputlisting{src/polymorphic-nth-wrong.moebius}
+    \end{tikzfigure*}
+    because code \moeb{nb<<fun xs => head 'a xs>>nb} depends on \moeb{'a} and thus is not closed.}
+
+  \block{Problem 3 \---- Pattern Matching on Code Fragments}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
 
   \block{Contextual Modality}{Some text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text}
 
