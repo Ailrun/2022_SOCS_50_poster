@@ -3,6 +3,8 @@
 \tikzposterlatexaffectionproofoff
 
 \usepackage{amssymb}
+\bibliographystyle{plain}
+\usepackage{natbib}
 \usepackage{libertine}
 \usepackage{listings}
 \usepackage[most]{tcolorbox}
@@ -38,14 +40,14 @@
 }
 \settitle{\vbox{
   \hspace*{2in}
-  \colorbox{white}{\hbox to 4in {\vbox to 4.4in {\vspace*{1.8in} \raisebox{-0.5\height}{\@titlegraphic}}}}
+  \colorbox{white}{\hbox to 4in {\vbox to 4.2in {\vspace*{1.7in} \raisebox{-0.5\height}{\@titlegraphic}}}}
   \hspace*{-6.8in}
   \vbox{
     % \@titlegraphic\\[\TP@titlegraphictotitledistance]
     \raggedleft
-    \vspace*{0.8in}
+    \vspace*{0.7in}
     \color{titlefgcolor} {\bfseries \Huge \sc \@title \hspace*{0.5in} \par}
-    \vspace*{0.8in}
+    \vspace*{0.7in}
     \vbox{
       {\LARGE \@author \par} \vspace*{0.1in} {\large https://Ailrun.github.io \par} \vspace*{0.3in} {\large \@institute \par}
       \vspace*{0.1in} {\large https://complogic.cs.mcgill.ca/}
@@ -57,8 +59,8 @@
 \defineblockstyle{MyBlock}{
   titlewidthscale=1, bodywidthscale=1, titleleft,
   titleoffsetx=0in, titleoffsety=0in, bodyoffsetx=0in, bodyoffsety=0.6in,
-  bodyverticalshift=0.6in, roundedcorners=2, linewidth=5pt,
-  titleinnersep=0.3in, bodyinnersep=0.3in
+  bodyverticalshift=0.5in, roundedcorners=2, linewidth=5pt,
+  titleinnersep=0.3in, bodyinnersep=0.4in
 }{
   \begin{scope}[line width=\blocklinewidth, rounded corners=\blockroundedcorners]
     \ifBlockHasTitle %
@@ -225,12 +227,10 @@ ws<<nthToOneBefore>>ws nthCode = case nthCode of
 \end{filecontents*}
 
 \begin{filecontents*}[overwrite]{src/open-int-nth.moebius}
-ws<<openIntNth>>ws : fg<<Int -> [xs : Int list |- Int]>>fg
-ws<<openIntNth>>ws n = if n <= 0 then
-                 box(nb<<xs>>nb . nb<<head Int xs>>nb)
-               else
-                 let box(nb<<xs>>nb . C) = ws<<openIntNth>>ws (n - 1) in
-                 box(nb<<xs>>nb . C with nb<<(tail Int xs)>>nb)
+ws<<openIntNth>>ws : fg<<Int -> [xs: Int list |- Int]>>fg
+ws<<openIntNth>>ws n = if n <= 0 then box(nb<<xs>>nb . nb<<head Int xs>>nb)
+                         else let box(nb<<xs>>nb . C) = ws<<openIntNth>>ws (n - 1) in
+                              box(nb<<xs>>nb . C with nb<<(tail Int xs)>>nb)
 \end{filecontents*}
 
 \begin{filecontents*}[overwrite]{src/open-int-nth-2-result.moebius}
@@ -238,16 +238,14 @@ box(nb<<xs>>nb . nb<<head (tail (tail xs))>>nb)
 \end{filecontents*}
 
 \begin{filecontents*}[overwrite]{src/polymorphic-nth.moebius}
-ws<<polyNth>>ws : fg<<('a : (|-^2 Type)) -> Int -> [xs : 'a list |-^1 'a]>>fg
-ws<<polyNth>>ws 'a n = if n <= 0 then
-                 box(nb<<xs>>nb .^1 nb<<head 'a xs>>nb)
-               else
-                 let box(xs .^1 C) = ws<<polyNth>>ws 'a (n - 1) in
-                 box(nb<<xs>>nb .^1 C nb<<(tail 'a xs)>>nb)
+ws<<polyNth>>ws : fg<<('a: (|-^2 Type)) -> Int -> [xs: 'a list |-^1 'a]>>fg
+ws<<polyNth>>ws 'a n = if n <= 0 then box(nb<<xs>>nb .^1 nb<<head 'a xs>>nb)
+                         else let box(xs .^1 C) = ws<<polyNth>>ws 'a (n - 1) in
+                              box(nb<<xs>>nb .^1 C nb<<(tail 'a xs)>>nb)
 \end{filecontents*}
 
 \begin{filecontents*}[overwrite]{src/contextual-matching.moebius}
-ws<<nthToOneBefore>>ws : ('a : (|-^2 Type)) -> fg<<[xs : 'a list |-^1 'a] -> [xs : 'a list |-^1 'a]>>fg
+ws<<nthToOneBefore>>ws : ('a: (|-^2 Type)) -> fg<<[xs: 'a list |-^1 'a] -> [xs: 'a list |-^1 'a]>>fg
 ws<<nthToOneBefore>>ws nthCode = case nthCode of
   | box(nb<<xs>>nb .^1 nb<<head xs>>nb) -> box(nb<<xs>>nb .^1 nb<<head xs>>nb)
   | box(nb<<xs>>nb .^1 nb<<head (tail>>nb u<<X>>unb<<)>>nb) -> box(nb<<xs>>nb .^1 nb<<head>>nb u<<X>>u)
@@ -300,7 +298,7 @@ ws<<nthToOneBefore>>ws nthCode = case nthCode of
       \end{tikzpicture}
     \end{tikzfigure*}
   }
-  \block{Metaprogramming with Box/Let-box}{
+  \block[bodyoffsety=0.8in]{Metaprogramming with Box/Let-box}{
     \begin{tikzfigure*}
       \begin{tikzpicture}
         \draw (0,2) node {\moeb{box(nb<<2 + 3>>nb)}} (20,2) node {A code fragment for \moeb{nb<<2 + 3>>nb}};
@@ -409,7 +407,7 @@ ws<<nthToOneBefore>>ws nthCode = case nthCode of
     \end{tikzfigure*}
     What would be the type of \moeb{u<<X>>u}?}
 
-  \block{Contextual Modality: Generalization of Necessity}{
+  \block[bodyoffsety=1in]{Contextual Modality: Generalization of Necessity}{
     \begin{tikzfigure*}
       \begin{tikzpicture}
         \draw (0,3) node {\moeb{fg<<[Gamma |- A]>>fg}} (20,3) node[text width=10in,align=center] {A type for code for \moeb{fg<<A>>fg}-typed program\\ \color{red!30!white}{that is valid under \moeb{fg<<Gamma>>fg}}};
@@ -425,12 +423,12 @@ ws<<nthToOneBefore>>ws nthCode = case nthCode of
       \lstinputlisting{src/open-int-nth-2-result.moebius}
     \end{tikzfigure*}}
 
-  \block{Levels: Necessity beyond Necessity}{
+  \block[bodyoffsety=0.8in]{Levels: Necessity beyond Necessity}{
     \begin{tikzfigure*}
       \begin{tikzpicture}
-        \draw (0,3) node {\moeb{fg<<(Gamma |-^1 A)>>fg}} (20,3) node[text width=10.5in,align=center] {Level 1 template depends on \(\Gamma\) of normal types};
+        \draw (0,2.5) node {\moeb{fg<<(Gamma |-^1 A)>>fg}} (20,2.5) node[text width=10.5in,align=center] {Level 1 template depends on \(\Gamma\) of normal types};
         \draw (0,0) node {\moeb{fg<<(Gamma |-^n A)>>fg}} (20,0) node[text width=10.5in,align=center] {Level n template depends on \(\Gamma\)\\ of normal types and level \makebox[1.1in]{\(\!\!\le{}\!n\!-\!1\)} templates};
-        \draw (0,-4) node {\moeb{fg<<[Gamma |-^n A]>>fg}} (20,-4) node[text width=10.5in,align=center] {\moeb{fg<<Gamma>>fg} may contain normal types and\\ \color{red!30!white}{level \makebox[1.1in]{\(\!\!\le{}\!n\!-\!1\)} templates}};
+        \draw (0,-3.5) node {\moeb{fg<<[Gamma |-^n A]>>fg}} (20,-3.5) node[text width=10.5in,align=center] {\moeb{fg<<Gamma>>fg} may contain normal types and\\ \color{red!30!white}{level \makebox[1.1in]{\(\!\!\le{}\!n\!-\!1\)} templates}};
       \end{tikzpicture}
     \end{tikzfigure*}
     \begin{tikzfigure*}[Polymorphic metaprogram to get the \(n\)-th item in a list]
@@ -441,6 +439,13 @@ ws<<nthToOneBefore>>ws nthCode = case nthCode of
     \end{tikzfigure*}
   where the type of \moeb{u<<X>>u} is \moeb{(xs : 'a list |-^2 'a list)}}
 
-  \block{References}{Pfenning\&Davies/Contextual Type/Moebius}
+  \block{Acknowledgement}{\normalsize This work can be done thanks to the guidance from my supervisor, Prof. Brigitte Pientka, and the help from two other coauthors, Prof. Stefan Monnier at UdeM and MSc. Samuel G\'elineau}
+
+  \block{References}{
+    % \renewcommand{\bibname}{}
+    \small
+    \renewcommand{\refname}{\vskip -0.65in}
+    \nocite{Jang:POPL22,Nanevski:TOCL08,Davies:ACM01}
+    \bibliography{bibl.bib}}
 \end{columns}
 \end{document}
